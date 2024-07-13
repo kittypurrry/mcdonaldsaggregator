@@ -8,8 +8,8 @@ export const JobListing = ({ jobs } : { jobs : Job[] }) => {
             <div className="flex min-w-0 gap-x-4">
             <img alt="" src={job.company.logo} className="h-12 w-12 flex-none rounded-full bg-gray-50" />
             <div className="min-w-0 flex-auto">
-                <p className="text-sm font-semibold leading-6 text-gray-900">{job.position}</p>
-                <p className="text-left truncate text-xs leading-5 text-gray-500">{job.company.name} </p>
+                <p className="text-left text-sm font-semibold leading-6 text-gray-900">{job.position}</p>
+                <p className="text-left truncate text-xs leading-5 text-gray-500">{job.company.name} • {job.department} </p>
             </div>
             </div>
             <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
