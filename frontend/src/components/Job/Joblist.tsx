@@ -5,7 +5,7 @@ export const JobListing = ({ jobs } : { jobs : Job[] }) => {
     return (
     <ul role="list" className="w-full flex flex-col gap-4">
         {jobs.map((job: Job) => (
-        <li key={job.company.name} className="flex items-center justify-between gap-x-6 py-5 border border-red rounded-md
+        <li key={job.company.name} className="flex items-center justify-between gap-x-6 py-5 border border-primaryRed rounded-md
         p-4">
             <div className="flex min-w-0 w-full items-center justify-between gap-x-2">
               <div className="min-w-0">
@@ -30,7 +30,7 @@ export const JobListing = ({ jobs } : { jobs : Job[] }) => {
             </div>
 
             {/** Apply button */}
-            <button className="h-fit transition-all bg-red px-4 py-1.5 text-sm text-[#FFF] outline-0 border-0 ring-0 hover:text-[#000] hover:ring-0 hover:outline-0 hover:bg-accentYellow">
+            <button className="h-fit transition-all bg-primaryRed px-4 py-1.5 text-sm text-[#FFF] outline-0 border-0 ring-0 hover:text-[#000] hover:ring-0 hover:outline-0 hover:bg-accentYellow">
               Apply
             </button>
         </li>

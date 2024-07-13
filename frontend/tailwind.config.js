@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        red: "#ED1313" ,
+        primaryRed: "#ED1313" ,
         brightYellow: "#FFFF00",
         accentYellow: "#FFFF66",
         mutedYellow: "#FFFF29",
@@ -15,5 +15,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/forms')],
 }
