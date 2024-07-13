@@ -1,16 +1,12 @@
-import { DynamicWidget } from "@dynamic-labs/sdk-react-core"
-import { Header } from "../../../components/Header"
-import { ReactNode } from "react"
+import Header from "../../../components/Header"
+import { Outlet } from "react-router-dom"
 
-export const Layout = ({ children }: { children: ReactNode }) => {
+export const Layout = () => {
   return (
     <>
-    <Header>
-      <DynamicWidget />
-    </Header>
-
-    <main className="mt-[6rem] w-full mx-auto px-4">
-      {children}
+    <Header />
+    <main className="pt-[5rem] w-full mx-auto px-4">
+      <Outlet />
     </main>
     </>
   )
