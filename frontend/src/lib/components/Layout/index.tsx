@@ -5,7 +5,7 @@ export const Layout = () => {
   return (
     <>
     <Header />
-    <main className="pt-[5rem] w-full mx-auto px-4">
+    <main className="pt-[3rem] w-full mx-auto px-4">
       <Outlet />
     </main>
     </>

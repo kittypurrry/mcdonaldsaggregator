@@ -1,4 +1,6 @@
 type Company = {
   name: string,
-  logo: string
+  website?: string,
+  logo?: string,
+  description?: string
 }
