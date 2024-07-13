@@ -16,19 +16,13 @@ const createFhevmInstance = async () => {
   const network = await provider.getNetwork();
   const chainId = +network.chainId.toString(); // 9090
 
-  console.log("network", network);
-  console.log("chainId", chainId);
-
   const ret = await provider.call({
     to: FHE_LIB_ADDRESS,
     // first four bytes of keccak256('fhePubKey(bytes1)') + 1 byte for library
     data: "0xd9d47bb001",
   });
-  console.log("return: ", ret);
-  console.log("return done")
   const decoded = AbiCoder.defaultAbiCoder().decode(["bytes"], ret);
   const publicKey = decoded[0];
-  console.log("public key: ", publicKey);
 
   return createInstance({ chainId, publicKey });
 };
@@ -70,8 +64,16 @@ const EditApplicant = () => {
 
     await initFhevm(); // Load TFHE
     const instance = await createFhevmInstance();
-    console.log(instance);
-    console.log("init done");
+    console.log(instance.encrypt64(10));
+
+    const transaction = {
+      account: primaryWallet?.address,
+      chain: 9090,
+      to: "0x3ae590eF3E999AbE7382997A0Eaa13BD8B27c2b7",
+      
+    };
+
+    const hash = await provider.sendTransaction(transaction);
 
     return;
     
