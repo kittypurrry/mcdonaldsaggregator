@@ -4,4 +4,5 @@ type Job = {
   type: "full-time" | "contract" | "part-time" | string,
   datePosted: Date
   department: string,
+  location: string
 }
