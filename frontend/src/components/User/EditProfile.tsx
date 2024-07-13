@@ -122,7 +122,7 @@ const EditApplicant = () => {
   return (
     <div className="flex flex-col items-start gap-y-6">
       <div className="items-start flex flex-col gap-y-0.5">
-        <h2 className="font-bold text-2xl">Candiate Registration</h2>
+        <h2 className="font-bold text-2xl">Applicant Registration</h2>
         <p className="font-medium">Create your account to apply for jobs and get matched with employers.</p>
       </div>
 
@@ -166,7 +166,7 @@ const EditApplicant = () => {
                     />
                 
                    { rangeError &&
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-3">
                       <ExclamationCircleIcon aria-hidden="true" className="h-5 w-5 text-red-500" />
                     </div>
                     }

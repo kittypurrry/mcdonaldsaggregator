@@ -40,7 +40,13 @@ export default function Header() {
               {/* Profile dropdown */}
               { isLoggedIn ?
               <Menu as="div" className="relative ml-3">
-                <div>
+                <div className="flex gap-x-3 items-center">
+                  {/** @ts-ignore */}
+                  { user?.metadata?.userType == 'company' &&
+                  <a href="/job/create" className="h-fit px-4 py-1.5 transition-all border border-[white] rounded-md text-sm text-white bg-transparent hover:bg-accentYellow hover:text-black hover:border-accentYellow !outline-none !ring-none">
+                    Post a Job
+                  </a>
+                  }
                   <MenuButton className="relative flex rounded-full ring-0 ring-primaryRed border-0 bg-primaryRed text-sm outline-none focus:outline-none hover:outline-none">
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">Open user menu</span>
@@ -90,6 +96,13 @@ export default function Header() {
       <DisclosurePanel className="sm:hidden">
         <div>
           <div className="fixed top-0 left-0 w-full mt-[4rem] bg-white border-b border-primaryRed space-y-1 px-2 rounded-md py-4">
+            <DisclosureButton
+              as="a"
+              href="/job/create"
+              className="block bg-primaryRed text-white rounded-md px-3 py-2 font-medium hover:bg-accentYellow hover:text-black"
+            >
+              Post a Job
+            </DisclosureButton>
             <DisclosureButton
               as="a"
               href="/edit"

@@ -1,8 +1,9 @@
 type Job = {
-  company: Company
-  position: string
+  company: Company,
+  position: string,
   type: "full-time" | "contract" | "part-time" | string,
-  datePosted: Date
+  datePosted: Date,
   department: string,
+  description: string,
   location: string
 }
