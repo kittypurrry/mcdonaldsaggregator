@@ -3,6 +3,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Logo } from './Icons/Logo'
 import { DynamicWidget, useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core'
 import { useEffect, useState } from 'react';
+import { UserSelectionModal } from './User/UserSelectionModal';
 
 export default function Header() {
 
@@ -14,7 +15,7 @@ export default function Header() {
 
   useEffect(() => {
     // @ts-ignore
-    if (!user?.metadata?.userType) {
+    if (user && !user?.metadata?.userType) {
       setShowUserSelectionModal(true)
     } else {
       setShowUserSelectionModal(false)
@@ -23,6 +24,7 @@ export default function Header() {
 
 
   return (
+    <>
     <Disclosure as="nav" className="bg-white">
       <div className="bg-red fixed top-0 left-0 w-screen px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
@@ -106,5 +108,10 @@ export default function Header() {
         </div>
       </DisclosurePanel>
     </Disclosure>
+
+    { showUserSelectionModal && 
+      <UserSelectionModal setCloseSelection={setShowUserSelectionModal} />
+    }
+    </>
   )
 }
