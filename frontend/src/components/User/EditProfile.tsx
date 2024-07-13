@@ -2,6 +2,36 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/database";
+import { BrowserProvider, AbiCoder } from 'ethers';
+import { initFhevm, createInstance } from 'fhevmjs';
+
+// Contract address of TFHE.sol.
+// From https://github.com/zama-ai/fhevmjs/blob/c4b8a80a8783ef965973283362221e365a193b76/bin/fhevm.js#L9
+const FHE_LIB_ADDRESS = "0x000000000000000000000000000000000000005d";
+
+const createFhevmInstance = async () => {
+  // Make sure your MetaMask is connected to Inco Gentry Testnet
+  const provider = new BrowserProvider(window.ethereum);
+
+  const network = await provider.getNetwork();
+  const chainId = +network.chainId.toString(); // 9090
+
+  console.log("network", network);
+  console.log("chainId", chainId);
+
+  const ret = await provider.call({
+    to: FHE_LIB_ADDRESS,
+    // first four bytes of keccak256('fhePubKey(bytes1)') + 1 byte for library
+    data: "0xd9d47bb001",
+  });
+  console.log("return: ", ret);
+  console.log("return done")
+  const decoded = AbiCoder.defaultAbiCoder().decode(["bytes"], ret);
+  const publicKey = decoded[0];
+  console.log("public key: ", publicKey);
+
+  return createInstance({ chainId, publicKey });
+};
 
 export const EditProfile = () => {
 
@@ -37,6 +67,13 @@ const EditApplicant = () => {
 
   const handleUpdateApplicantInfo = async (e: any) => {
     e.preventDefault();
+
+    await initFhevm(); // Load TFHE
+    const instance = await createFhevmInstance();
+    console.log(instance);
+    console.log("init done");
+
+    return;
     
     try { 
       if (resume) {
@@ -62,7 +99,6 @@ const EditApplicant = () => {
           console.log("Resume uploaded successfully")
         }
       }
-
     }
     } catch (error) {
       console.log(error)
