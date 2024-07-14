@@ -13,8 +13,6 @@ contract JobListings {
 
     struct JobPost {
         SalaryRange salaryRange;
-        string description;
-        string company;
     }
 
     struct Applicant {
@@ -25,26 +23,22 @@ contract JobListings {
     mapping(uint256 => JobPost) public jobPosts;
     uint256 public jobPostCount;
 
-    event JobPostAdded(uint256 jobId, string description, string company);
+    event JobPostAdded(uint256 jobId);
     event ApplicantAdded(address applicant);
 
-    function addJobPost(bytes calldata _lowerRange, bytes calldata _higherRange, string memory _description, string memory _company) public {
+    function addJobPost(uint256 jobId, bytes calldata _lowerRange, bytes calldata _higherRange) public {
         euint32 lowerRange = TFHE.asEuint32(_lowerRange);
         euint32 higherRange = TFHE.asEuint32(_higherRange);
 
-
         ebool isLower = TFHE.lt(lowerRange, higherRange);
         require(TFHE.decrypt(isLower), "Invalid salary range");
-        require(bytes(_company).length > 0, "Company name cannot be empty");
 
         jobPostCount++;
-        jobPosts[jobPostCount] = JobPost(
-            SalaryRange(lowerRange, higherRange),
-            _description,
-            _company
+        jobPosts[jobId] = JobPost(
+            SalaryRange(lowerRange, higherRange)
         );
 
-        emit JobPostAdded(jobPostCount, _description, _company);
+        emit JobPostAdded(jobId);
     }
 
     function addApplicant(bytes calldata _lowerRange, bytes calldata _higherRange) public {
@@ -57,7 +51,7 @@ contract JobListings {
         
         emit ApplicantAdded(msg.sender);
     }
-
+    
     function isMatchingSalaryRange(uint256 jobId, address applicantAddress) public view returns (bool) {
         require(jobId > 0 && jobId <= jobPostCount, "Invalid job ID");
 
