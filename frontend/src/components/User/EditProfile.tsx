@@ -255,6 +255,7 @@ const EditCompany = () => {
   const handleUpdateCompanyInfo = async (e: any) => {
     e.preventDefault();
     let logoUrl = companyInfo.logo
+    setProcessing(true)
 
     try {
       if (!!logo) {
@@ -280,10 +281,12 @@ const EditCompany = () => {
         .select()
 
       if (status == 201) {
+        setProcessing(false)
         console.log("Logo uploaded successfully")
       }
     } catch (error) {
       console.log(error)
+      setProcessing(false)
     }
   }
 
