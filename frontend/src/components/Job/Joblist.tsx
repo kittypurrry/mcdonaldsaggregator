@@ -140,7 +140,7 @@ export const JobListing = () => {
 
 
   return (
-    <ul role="list" className="w-full flex flex-col gap-4">
+    <ul role="list" className="w-full flex flex-col gap-4 min-h-[70vh]">
       {(jobs || []).map((job: Job & { id: number }) => (
         <li key={job.company.name + job.id} className="flex items-center justify-between gap-x-6 py-5 border border-primaryRed rounded-md
         p-4">

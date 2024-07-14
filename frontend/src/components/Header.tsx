@@ -28,12 +28,12 @@ export default function Header() {
     <Disclosure as="nav" className="bg-white">
       <div className="bg-primaryRed fixed top-0 left-0 w-screen px-4 sm:px-6 lg:px-8 z-[10]">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
+          <a className="flex items-center cursor-pointer" href="/">
             <div className="flex-shrink-0 flex gap-x-8 items-center">
               <Logo />
               <h1 className="font-bold text-[#FFF] text-lg mt-1">McDonalds Aggregator</h1>
             </div>
-          </div>
+          </a>
           <div className="hidden sm:ml-6 sm:block">
             <div className="flex items-center">
 
