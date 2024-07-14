@@ -84,7 +84,7 @@ const EditApplicant = () => {
     const instance = await createFhevmInstance();
 
     const result = await writeContractAsync({
-      address: '0x3ae590eF3E999AbE7382997A0Eaa13BD8B27c2b7',
+      address: '0xEC3676fd25A7d5D0B885C8c0f3083B15aaC597DA',
       abi:
         [
           {
