@@ -1,8 +1,13 @@
+import { useQuery } from "@tanstack/react-query";
 import { getTimeDifference } from "../../lib/helper"
 import { Pin } from "../Icons/pin"
 import { BrowserProvider, AbiCoder } from 'ethers';
 import { initFhevm, createInstance } from 'fhevmjs';
-import { useReadContract } from 'wagmi'
+import { useConfig, useReadContract } from 'wagmi'
+import { supabase } from "../../lib/database";
+import { useEffect, useState } from "react";
+import { readContract } from "wagmi/actions";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 // Contract address of TFHE.sol.
 // From https://github.com/zama-ai/fhevmjs/blob/c4b8a80a8783ef965973283362221e365a193b76/bin/fhevm.js#L9
@@ -31,7 +36,31 @@ const createFhevmInstance = async () => {
   return createInstance({ chainId, publicKey });
 };
 
-export const JobListing = ({ jobs }: { jobs: Job[] }) => {
+export const JobListing = () => {  
+
+  const { user, primaryWallet } = useDynamicContext()
+  const config = useConfig();
+ 
+  const { data:jobs } = useQuery({
+    queryKey: ['getAllJobs'],
+    queryFn: async() => {
+      let allJobs = (await supabase.from('jobs').select()).data
+      let allCompanies = (await supabase.from('companies').select()).data
+      allJobs = (allJobs || []).map((job: any) => {
+        let company = allCompanies?.find((company: Company & { wallet_address: string} ) => company.wallet_address == job.wallet_address)
+
+        return {
+          ...job,
+          company: company,
+          datePosted: job.date_posted
+        }
+      })
+      
+      return allJobs
+    }
+  })
+
+  /** 
   const result = useReadContract({
     abi: [
       {
@@ -62,56 +91,60 @@ export const JobListing = ({ jobs }: { jobs: Job[] }) => {
     address: '0x6b175474e89094c44da98b954eedeac495271d0f',
     functionName: 'isMatchingSalaryRange',
     args: [1n, "0x46EA78EFC79aed85B0DE4d4dcecB53633d5E3445"]
-  })
+  })**/
 
-  console.log("result: ", result);
 
-  const handleApplyJob = async (e: any) => {
+  const handleApplyJob = async (e: any, jobId: number) => {
     e.preventDefault();
 
-    await initFhevm(); // Load TFHE
-    const instance = await createFhevmInstance();
+    try {
+      const result = await readContract(config, {
+        address: '0xEC3676fd25A7d5D0B885C8c0f3083B15aaC597DA',
+        abi:
+          [
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "jobId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "applicantAddress",
+                  "type": "address"
+                }
+              ],
+              "name": "isMatchingSalaryRange",
+              "outputs": [
+                {
+                  "internalType": "bool",
+                  "name": "",
+                  "type": "bool"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+          ]
+        ,
+        functionName: 'isMatchingSalaryRange',
+        args: [BigInt(jobId), primaryWallet?.address as `0x${string}`]
+      })
+    } catch( error: any) {
+      console.log(error)
+      console.log(error.message)
+      return error
+    }
 
-    const result = await writeContractAsync({
-      address: '0xEC3676fd25A7d5D0B885C8c0f3083B15aaC597DA',
-      abi:
-        [
-          {
-            "inputs": [
-              {
-                "internalType": "uint256",
-                "name": "jobId",
-                "type": "uint256"
-              },
-              {
-                "internalType": "address",
-                "name": "applicantAddress",
-                "type": "address"
-              }
-            ],
-            "name": "isMatchingSalaryRange",
-            "outputs": [
-              {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-              }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-          },
-        ]
-      ,
-      functionName: 'isMatchingSalaryRange',
-      args: [1, "0x46EA78EFC79aed85B0DE4d4dcecB53633d5E3445"]
-    })
-    console.log(result);
+    console.log(result)
   }
+
 
   return (
     <ul role="list" className="w-full flex flex-col gap-4">
-      {jobs.map((job: Job) => (
-        <li key={job.company.name} className="flex items-center justify-between gap-x-6 py-5 border border-primaryRed rounded-md
+      {(jobs || []).map((job: Job & { id: number }) => (
+        <li key={job.company.name + job.id} className="flex items-center justify-between gap-x-6 py-5 border border-primaryRed rounded-md
         p-4">
           <div className="flex min-w-0 w-full items-center justify-between gap-x-2">
             <div className="min-w-0">
@@ -136,7 +169,7 @@ export const JobListing = ({ jobs }: { jobs: Job[] }) => {
           </div>
 
           {/** Apply button */}
-          <button onClick={(e) => handleApplyJob(e)} className="h-fit transition-all bg-primaryRed px-4 py-1.5 text-sm text-[#FFF] outline-0 border-0 ring-0 hover:text-[#000] hover:ring-0 hover:outline-0 hover:bg-accentYellow">
+          <button onClick={(e) => handleApplyJob(e, job.id)} className="h-fit transition-all bg-primaryRed px-4 py-1.5 text-sm text-[#FFF] outline-0 border-0 ring-0 hover:text-[#000] hover:ring-0 hover:outline-0 hover:bg-accentYellow">
             Apply
           </button>
         </li>
