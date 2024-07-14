@@ -14,7 +14,7 @@ import {
 } from 'wagmi';
 import { DynamicWagmiConnector } from '@dynamic-labs/wagmi-connector';
 import { http, type Chain } from 'viem'
-import { CreateJob } from './components/Job/Create'
+import { CreateJob } from './components/Job/create'
 
 export const inco = {
   id: 9090,
