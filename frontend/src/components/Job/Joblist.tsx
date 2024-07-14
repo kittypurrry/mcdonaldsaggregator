@@ -47,7 +47,7 @@ export const JobListing = () => {
 
     try {
       const result = await readContract(config, {
-        address: '0x05D39616DEFD9f2dcC0f0E2f012a9Bc1F4CFAf93',
+        address: '0x50fE56C3d91B7C5F7B2d0f25a994D2b0576f89e1',
         abi:
           [
             {
