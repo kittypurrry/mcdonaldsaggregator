@@ -1,10 +1,11 @@
-import { useUserUpdateRequest } from '@dynamic-labs/sdk-react-core';
+import { useDynamicContext, useUserUpdateRequest } from '@dynamic-labs/sdk-react-core';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import { BurgerOpenIcon } from '../Icons/BurgerOpen';
 
 export const UserSelectionModal = ({ setCloseSelection }: { setCloseSelection: Function }) => {
   
   const { updateUser } = useUserUpdateRequest();
+  const { user } = useDynamicContext();
 
   return (
     <Dialog open={true} onClose={() => setCloseSelection()} className="relative z-10">
@@ -39,6 +40,7 @@ export const UserSelectionModal = ({ setCloseSelection }: { setCloseSelection: F
                 type="button"
                 onClick={() => updateUser({
                   metadata: {
+                    ...user?.metadata,
                     userType: 'company'
                   }
                 })}
@@ -51,6 +53,7 @@ export const UserSelectionModal = ({ setCloseSelection }: { setCloseSelection: F
                 data-autofocus
                 onClick={() => updateUser({
                   metadata: {
+                    ...user?.metadata,
                     userType: 'user'
                   }
                 })}

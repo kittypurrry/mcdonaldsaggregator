@@ -31,7 +31,7 @@ export default function Header() {
           <div className="flex items-center">
             <div className="flex-shrink-0 flex gap-x-8 items-center">
               <Logo />
-              <h1 className="font-bold text-[#FFF] text-lg mt-1">Mcdonalds Aggregator</h1>
+              <h1 className="font-bold text-[#FFF] text-lg mt-1">McDonalds Aggregator</h1>
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:block">
