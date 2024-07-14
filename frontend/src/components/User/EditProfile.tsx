@@ -245,6 +245,8 @@ const EditCompany = () => {
           description: dbInfo.description
         })
       }
+
+      return true;
     },
     enabled: !!primaryWallet?.address
   })
@@ -279,10 +281,14 @@ const EditCompany = () => {
         .upsert({ wallet_address: primaryWallet?.address, logo: logoUrl, name: companyInfo.name, website: companyInfo.website, description: companyInfo.description, last_edited: new Date() })
         .select()
 
-      if (status == 201) {
+      if (status == 201 || status == 200) {
         setProcessing(false)
+
+        window.location.href = "/job/create"
         console.log("Logo uploaded successfully")
       }
+
+      setProcessing(false)
     } catch (error) {
       console.log(error)
       setProcessing(false)

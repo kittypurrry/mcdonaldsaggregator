@@ -4,12 +4,24 @@ import { Logo } from './Icons/Logo'
 import { DynamicWidget, useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core'
 import { useEffect, useState } from 'react';
 import { UserSelectionModal } from './User/UserSelectionModal';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '../lib/database';
 
 export default function Header() {
 
   const isLoggedIn = useIsLoggedIn();
   const { handleLogOut } = useDynamicContext();
-  const { user } = useDynamicContext();
+  const { user, primaryWallet } = useDynamicContext();
+  const { data: companyExists } = useQuery({
+    queryKey: ['lookForCompanies', primaryWallet?.address ],
+    queryFn: async() => {
+      let company = await supabase.from('companies').select().eq('wallet_address', primaryWallet?.address)
+      return company?.data?.[0] ?? false 
+    },
+    // @ts-ignore
+    enabled: !!user && !!primaryWallet && user?.metadata?.userType == 'company'
+  })
+
 
   const [showUserSelectionModal, setShowUserSelectionModal] = useState<boolean>(false)
 
@@ -42,11 +54,14 @@ export default function Header() {
               <Menu as="div" className="relative ml-3">
                 <div className="flex gap-x-3 items-center">
                   {/** @ts-ignore */}
-                  { user?.metadata?.userType == 'company' &&
+                  {(user?.metadata?.userType == 'company' && (!companyExists ?
+                   <a href="/edit" className="h-fit px-4 py-1.5 transition-all border border-[white] rounded-md text-sm text-white bg-transparent hover:bg-accentYellow hover:text-black hover:border-accentYellow !outline-none !ring-none">
+                     Register your company
+                   </a>:
                   <a href="/job/create" className="h-fit px-4 py-1.5 transition-all border border-[white] rounded-md text-sm text-white bg-transparent hover:bg-accentYellow hover:text-black hover:border-accentYellow !outline-none !ring-none">
                     Post a Job
                   </a>
-                  }
+                 )) }
                   <MenuButton className="relative flex rounded-full ring-0 ring-primaryRed border-0 bg-primaryRed text-sm outline-none focus:outline-none hover:outline-none">
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">Open user menu</span>

@@ -63,7 +63,7 @@ export const CreateJob = () => {
         .insert({ wallet_address: primaryWallet?.address, position: jobInfo.position, location: jobInfo.location, department: jobInfo.department, type: jobInfo.type, description: jobInfo.description, date_posted: new Date() })
         .select()
 
-      if (status == 201) {
+      if (status == 201 || status == 200) {
         console.log("Job posted successfully.")
 
         // job id created ---> data?.[0]
@@ -207,7 +207,7 @@ export const CreateJob = () => {
               </div>
             </div>
 
-            <button onClick={(e) => handleAddJob(e)} className={`flex items-center mt-16 border-0 ring-0 outline-0 transition-all w-full px-4 rounded-md py-2 text-sm text-white hover:bg-accentYellow hover:text-black cursor-pointer
+            <button onClick={(e) => handleAddJob(e)} className={`w-full justify-center flex text-center items-center mt-16 border-0 ring-0 outline-0 transition-all w-full px-4 rounded-md py-2 text-sm text-white hover:bg-accentYellow hover:text-black cursor-pointer
             ${salaryRange.max < salaryRange.min || salaryRange.min == 0 || salaryRange.max == 0 || !jobInfo.position ? 'pointer-events-none bg-gray-400' : 'bg-primaryRed'}`}>
              { processing ? <Loading /> : 'Post a Job' }
             </button>
