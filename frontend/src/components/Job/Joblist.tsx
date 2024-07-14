@@ -2,43 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { getTimeDifference } from "../../lib/helper"
 import { Pin } from "../Icons/pin"
 import { BrowserProvider, AbiCoder } from 'ethers';
-import { initFhevm, createInstance } from 'fhevmjs';
-import { useConfig, useReadContract } from 'wagmi'
+import { useConfig } from 'wagmi'
 import { supabase } from "../../lib/database";
-import { useEffect, useState } from "react";
 import { readContract } from "wagmi/actions";
 import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
-
-// Contract address of TFHE.sol.
-// From https://github.com/zama-ai/fhevmjs/blob/c4b8a80a8783ef965973283362221e365a193b76/bin/fhevm.js#L9
-const FHE_LIB_ADDRESS = "0x000000000000000000000000000000000000005d";
-
 // @ts-ignore
 export const toHexString = (bytes) =>
   bytes.reduce((str: any, byte: any) => str + byte.toString(16).padStart(2, "0"), "");
 
-const createFhevmInstance = async () => {
-  // Make sure your MetaMask is connected to Inco Gentry Testnet
-  // @ts-ignore
-  const provider = new BrowserProvider(window.ethereum);
-
-  const network = await provider.getNetwork();
-  const chainId = +network.chainId.toString(); // 9090
-
-  const ret = await provider.call({
-    to: FHE_LIB_ADDRESS,
-    // first four bytes of keccak256('fhePubKey(bytes1)') + 1 byte for library
-    data: "0xd9d47bb001",
-  });
-  const decoded = AbiCoder.defaultAbiCoder().decode(["bytes"], ret);
-  const publicKey = decoded[0];
-
-  return createInstance({ chainId, publicKey });
-};
 
 export const JobListing = () => {  
 
-  const { user, primaryWallet } = useDynamicContext()
+  const { primaryWallet } = useDynamicContext()
   const config = useConfig();
   const isLoggedIn = useIsLoggedIn();
 
@@ -101,6 +76,7 @@ export const JobListing = () => {
         args: [BigInt(jobId), primaryWallet?.address as `0x${string}`]
       })
 
+      console.log(result)
     } catch( error: any) {
       console.log(error)
       console.log(error.message)
