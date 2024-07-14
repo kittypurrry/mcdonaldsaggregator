@@ -5,6 +5,7 @@ import { SalaryRange } from "../../lib/components/Job/SalaryRange";
 import { BrowserProvider, AbiCoder } from 'ethers';
 import { initFhevm, createInstance } from 'fhevmjs';
 import { useWriteContract } from 'wagmi'
+import { Loading } from "../Icons/Loading";
 
 // Contract address of TFHE.sol.
 // From https://github.com/zama-ai/fhevmjs/blob/c4b8a80a8783ef965973283362221e365a193b76/bin/fhevm.js#L9
@@ -37,6 +38,7 @@ export const CreateJob = () => {
 
   const [salaryRange, setSalaryRange] = useState<{ min: number, max: number }>({ min: 0, max: 0 })
   const { data: hash, writeContractAsync } = useWriteContract();
+  const [processing, setProcessing] = useState<boolean>(false)
 
   const [jobInfo, setJobInfo] = useState<Job>({
     company: { name: "" },
@@ -53,6 +55,7 @@ export const CreateJob = () => {
 
   const handleAddJob = async (e: any) => {
     e.preventDefault();
+    setProcessing(true);
 
     try {
       const { data, status } = await supabase
@@ -69,7 +72,7 @@ export const CreateJob = () => {
         await initFhevm(); // Load TFHE
       const instance = await createFhevmInstance();
 
-      const result = await writeContractAsync({
+      await writeContractAsync({
         address: '0xEC3676fd25A7d5D0B885C8c0f3083B15aaC597DA',
         abi:
           [{
@@ -100,9 +103,10 @@ export const CreateJob = () => {
         functionName: 'addJobPost',
         args: [jobId, `0x${toHexString(instance.encrypt32(salaryRange.min))}`, `0x${toHexString(instance.encrypt32(salaryRange.max))}`]
       })
-      console.log(result);
+      setProcessing(false)
       }
     } catch (error) {
+      setProcessing(false)
       console.log(error)
     }
   }
@@ -203,8 +207,10 @@ export const CreateJob = () => {
               </div>
             </div>
 
-            <button onClick={(e) => handleAddJob(e)} className={`mt-16 border-0 ring-0 outline-0 transition-all w-full px-4 rounded-md py-2 text-sm text-white hover:bg-accentYellow hover:text-black cursor-pointer
-            ${salaryRange.max < salaryRange.min || salaryRange.min == 0 || salaryRange.max == 0 || !jobInfo.position ? 'pointer-events-none bg-gray-400' : 'bg-primaryRed'}`}>Post a Job</button>
+            <button onClick={(e) => handleAddJob(e)} className={`flex items-center mt-16 border-0 ring-0 outline-0 transition-all w-full px-4 rounded-md py-2 text-sm text-white hover:bg-accentYellow hover:text-black cursor-pointer
+            ${salaryRange.max < salaryRange.min || salaryRange.min == 0 || salaryRange.max == 0 || !jobInfo.position ? 'pointer-events-none bg-gray-400' : 'bg-primaryRed'}`}>
+             { processing ? <Loading /> : 'Post a Job' }
+            </button>
 
           </form>
         </div>
