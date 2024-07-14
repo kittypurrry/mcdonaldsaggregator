@@ -88,7 +88,6 @@ const EditApplicant = () => {
           lastSalaryUpdate: new Date().getTime()
         }
       })
-
       setProcessing(false)
     } else if (isError) {
       setProcessing(false)
@@ -106,7 +105,7 @@ const EditApplicant = () => {
       await initFhevm(); // Load TFHE
       const instance = await createFhevmInstance();
       
-      const result = await writeContractAsync({
+      await writeContractAsync({
         address: '0x3ae590eF3E999AbE7382997A0Eaa13BD8B27c2b7',
         abi:
           [
@@ -167,8 +166,6 @@ const EditApplicant = () => {
       setProcessing(false)
       console.log(error)
     }
-
-    setProcessing(false)
   }
 
   useEffect(() => {
@@ -221,7 +218,7 @@ const EditApplicant = () => {
         </button>
 
         { isSuccess && hash &&
-          <p className="text-xs text-center mt-1">Salary range updated successfully! <a className="cursor-pointer underline" href={`https://explorer.testnet.inco.org/tx/${hash}`}>View transaction here</a></p>
+          <p className="text-xs text-center mt-1">Salary range updated successfully! <a className="cursor-pointer underline" href={`https://explorer.testnet.inco.org/tx/${hash}`} target="_blank" rel="noreferrer">View transaction here</a></p>
         }
       </form>
     </div>

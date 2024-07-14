@@ -200,6 +200,7 @@ export const CreateJob = () => {
 
                 {/** Salary Range */}
                 <SalaryRange allowRangeUpdate={true} salaryRange={salaryRange} setSalaryRange={setSalaryRange} helpText="The salary range will be secured and hidden from applicants with Fully Homomorphic Encryption (FHE)." />
+              </div>
             </div>
 
             <button onClick={(e) => handleAddJob(e)} className={`mt-16 border-0 ring-0 outline-0 transition-all w-full px-4 rounded-md py-2 text-sm text-white hover:bg-accentYellow hover:text-black cursor-pointer
