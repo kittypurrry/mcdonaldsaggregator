@@ -1,7 +1,7 @@
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline"
 import { useEffect, useState } from "react"
 
-export const SalaryRange = ({ salaryRange, setSalaryRange, helpText }: { salaryRange: { min: number, max: number}, setSalaryRange: Function, helpText: string }) => {
+export const SalaryRange = ({ salaryRange, setSalaryRange, helpText, allowRangeUpdate = false }: { salaryRange: { min: number, max: number}, setSalaryRange: Function, helpText: string, allowRangeUpdate?: boolean }) => {
   
   const [rangeError, setRangeError] = useState<boolean>(false)
 
@@ -28,10 +28,11 @@ export const SalaryRange = ({ salaryRange, setSalaryRange, helpText }: { salaryR
                     min: Number(e.target.value)
                     })}
                 type="number"
+                disabled={!allowRangeUpdate}
                 min={0}
                 placeholder="80000"
                 aria-describedby="salaryMin"
-                className="px-2 w-full bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className={`px-2 w-full block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 ${ allowRangeUpdate ? 'bg-transparent' : 'bg-gray-300 cursor-pointer-none'}`}
             />
         </div>
         <div className="w-full flex flex-col gap-y-1 items-start flex-grow">
@@ -45,10 +46,11 @@ export const SalaryRange = ({ salaryRange, setSalaryRange, helpText }: { salaryR
                         max: Number(e.target.value)
                     })}
                     min={0}
+                    disabled={!allowRangeUpdate}
                     max={10000000}
                     placeholder="960000"
                     aria-describedby="salaryMax"
-                    className={`px-2 bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 ${rangeError ? 'ring-red-400' : 'ring-gray-300'}`}
+                    className={`px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 ${rangeError ? 'ring-red-400' : 'ring-gray-300'} ${ allowRangeUpdate ? 'bg-transparent' : 'bg-gray-300 cursor-pointer-none'}`}
                 />
             
                 { rangeError &&
@@ -59,9 +61,11 @@ export const SalaryRange = ({ salaryRange, setSalaryRange, helpText }: { salaryR
             </div>
         </div>
         </div>
-        <p className="text-left mt-2 text-sm text-gray-500">
-          {helpText}
-        </p>
+        <p className="text-left mt-2 text-sm text-gray-500" dangerouslySetInnerHTML={{ __html: helpText}}/>
+
+        { !allowRangeUpdate && 
+        <p className="text-left text-red-600 text-xs mt-2">You can only update your salary range every 3 months.</p>
+        }
     </div>
   )
 }

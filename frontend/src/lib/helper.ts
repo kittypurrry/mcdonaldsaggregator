@@ -20,3 +20,13 @@ export const getTimeDifference = (comparisonDates: Date[]) => {
     return returnedString;
   };
   
+export const allowRangeUpdate = (dateToCompare: Date) => {
+  let a = moment(dateToCompare)
+  let b = moment(new Date())
+
+  if (a.diff(b, 'months') > 3) {
+    return true
+  } else {
+    return false
+  }
+}

@@ -199,7 +199,7 @@ export const CreateJob = () => {
                 </div>
 
                 {/** Salary Range */}
-                <SalaryRange salaryRange={salaryRange} setSalaryRange={setSalaryRange} helpText="The salary range will be secured and hidden from applicants with Fully Homomorphic Encryption (FHE)." />
+                <SalaryRange allowRangeUpdate={true} salaryRange={salaryRange} setSalaryRange={setSalaryRange} helpText="The salary range will be secured and hidden from applicants with Fully Homomorphic Encryption (FHE)." />
               </div>
             </div>
 
