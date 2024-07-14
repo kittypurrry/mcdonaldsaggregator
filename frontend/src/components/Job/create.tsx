@@ -42,7 +42,7 @@ export const CreateJob = () => {
     <div className="w-full max-w-[60rem] mx-auto lg:p-8">
       <div className='border border-primaryRed rounded-lg px-4 py-6'>
 
-      <div className="flex flex-col items-start gap-y-6">
+      <div className="flex flex-col items-start gap-y-6 max-w-[60rem] mx-auto">
         <div className="items-start flex flex-col gap-y-0.5">
           <h2 className="font-bold text-2xl">Post a Job</h2>
           <p className="font-medium">Enter the details below to post a new job listing.</p>

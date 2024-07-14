@@ -33,7 +33,7 @@ export const EditProfile = () => {
   const { user } = useDynamicContext();
 
   return (
-    <div className="w-full lg:p-8">
+    <div className="w-full lg:p-8 max-w-[60rem] mx-auto">
       <div className='border border-primaryRed rounded-lg px-4 py-6'>
         {/** @ts-ignore */}
         { user?.metadata.userType == 'company' ?
@@ -120,7 +120,7 @@ const EditApplicant = () => {
   }
 
   return (
-    <div className="flex flex-col items-start gap-y-6">
+    <div className="flex flex-col items-start gap-y-6 max-w-[60rem] mx-auto">
       <div className="items-start flex flex-col gap-y-0.5">
         <h2 className="font-bold text-2xl">Applicant Registration</h2>
         <p className="font-medium">Create your account to apply for jobs and get matched with employers.</p>
@@ -128,7 +128,7 @@ const EditApplicant = () => {
 
      
       <form className="w-full">
-        <div className="mt-6 max-w-[40rem]">
+        <div className="mt-6 max-w-[60rem] w-full">
             <label className="font-bold text-left block text-md mb-2 font-medium leading-6 text-gray-900">
             Salary Range (USD)
             </label>
@@ -178,7 +178,7 @@ const EditApplicant = () => {
             </p>
         </div>
 
-        <div className="mt-6 w-full max-w-[40rem]">
+        <div className="mt-6 w-full max-w-[60rem]">
            <label className="font-bold text-left block text-md mb-2 font-medium leading-6 text-gray-900">
             Upload your resume
            </label>
@@ -274,7 +274,7 @@ const EditCompany = () => {
   }
 
   return (
-  <div className="flex flex-col items-start gap-y-6">
+  <div className="flex flex-col items-start gap-y-6 max-w-[60rem] mx-auto">
     <div className="items-start flex flex-col gap-y-0.5">
       <h2 className="font-bold text-2xl">Company Registration</h2>
       <p className="font-medium">Set up your company in order to post jobs and find qualified candidates</p>
@@ -282,7 +282,7 @@ const EditCompany = () => {
 
    
     <form className="w-full">
-      <div className="mt-6 max-w-[40rem]">
+      <div className="mt-6 max-w-[60rem] w-full">
           <label className="font-bold text-left block text-lg mb-2 font-medium leading-6 text-gray-900">
           Company Details
           </label>
