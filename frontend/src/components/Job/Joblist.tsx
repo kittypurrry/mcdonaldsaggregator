@@ -5,6 +5,9 @@ import { useConfig } from 'wagmi'
 import { supabase } from "../../lib/database";
 import { readContract } from "wagmi/actions";
 import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
+import { useState } from "react";
+import { RejectionModal } from "./RejectionModal";
+import { SuccessModal } from "./SuccessModal";
 // @ts-ignore
 export const toHexString = (bytes) =>
   bytes.reduce((str: any, byte: any) => str + byte.toString(16).padStart(2, "0"), "");
@@ -15,7 +18,8 @@ export const JobListing = () => {
   const { primaryWallet } = useDynamicContext()
   const config = useConfig();
   const isLoggedIn = useIsLoggedIn();
-  const [showDoesNotMatchModal, setShowDoesNotMatchModal] = 
+  const [showRejectionModal, setShowRejectionModal] = useState<boolean>(false)
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
 
  
   const { data:jobs } = useQuery({
@@ -78,7 +82,11 @@ export const JobListing = () => {
 
       // if does not match, show to user
       if (!result) {
-        showDoesNotMatchModal()
+        setShowSuccessModal(false)
+        setShowRejectionModal(true)
+      } else {
+        setShowSuccessModal(true)
+        setShowRejectionModal(false)
       }
 
       console.log(result)
@@ -123,6 +131,14 @@ export const JobListing = () => {
           </button>
         </li>
       ))}
+
+      { showRejectionModal &&
+        <RejectionModal setShowModal={setShowRejectionModal} />
+      }
+
+      { showSuccessModal && 
+        <SuccessModal setShowModal={setShowSuccessModal} />
+      }
     </ul>
   )
 }
