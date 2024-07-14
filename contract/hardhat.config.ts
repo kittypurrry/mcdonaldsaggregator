@@ -6,8 +6,7 @@ import type { NetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 
 import "./plugins/crossdeploy";
-
-import { networks } from "./plugins/crossdeploy/networks"
+import { networks } from "./plugins/crossdeploy/networks";
 
 const dotenvConfigPath: string = process.env.DOTENV_CONFIG_PATH || "./.env";
 dotenvConfig({ path: resolve(__dirname, dotenvConfigPath) });
@@ -24,16 +23,16 @@ const chainIds = {
   baseSepolia: networks.baseSepolia.chainId,
   edgeless: networks.edgeless.chainId,
   redstone: networks.redstone.chainId,
+  sepolia: networks.sepolia.chainId,
 };
 
 function getChainConfig(chain: keyof typeof chainIds): NetworkUserConfig {
   let jsonRpcUrl: string;
   switch (chain) {
-    
     case "local":
       jsonRpcUrl = "http://localhost:8545";
       break;
-    
+
     case "inco":
       jsonRpcUrl = networks.inco.rpcUrl;
       break;
@@ -45,6 +44,9 @@ function getChainConfig(chain: keyof typeof chainIds): NetworkUserConfig {
       break;
     case "redstone":
       jsonRpcUrl = networks.redstone.rpcUrl;
+      break;
+    case "sepolia":
+      jsonRpcUrl = networks.sepolia.rpcUrl;
       break;
   }
   return {
@@ -78,6 +80,7 @@ const config: HardhatUserConfig = {
     edgeless: getChainConfig("edgeless"),
     redstone: getChainConfig("redstone"),
     local: getChainConfig("local"),
+    sepolia: getChainConfig("sepolia"),
   },
   paths: {
     artifacts: "./artifacts",
@@ -115,9 +118,9 @@ const config: HardhatUserConfig = {
     target: "ethers-v6",
   },
   crossdeploy: {
-    contracts:  ["HiddenSalary", "JobListings"],
+    contracts: ["HiddenSalary", "JobListings"],
     signer: process.env.PRIVATE_KEY || "",
-  }
+  },
 };
 
 export default config;

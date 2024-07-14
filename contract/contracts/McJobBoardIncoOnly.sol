@@ -2,8 +2,8 @@
 
 pragma solidity >=0.8.9 <0.9.0;
 
-import "fhevm@v0.3.0/lib/TFHE.sol";
-import "fhevm@v0.3.0/abstracts/EIP712WithModifier.sol";
+import "fhevm/lib/TFHE.sol";
+import "fhevm/abstracts/EIP712WithModifier.sol";
 
 contract JobListings {
     struct SalaryRange {
@@ -34,9 +34,7 @@ contract JobListings {
         require(TFHE.decrypt(isLower), "Invalid salary range");
 
         jobPostCount++;
-        jobPosts[jobId] = JobPost(
-            SalaryRange(lowerRange, higherRange)
-        );
+        jobPosts[jobId] = JobPost(SalaryRange(lowerRange, higherRange));
 
         emit JobPostAdded(jobId);
     }
@@ -48,10 +46,10 @@ contract JobListings {
         ebool isLower = TFHE.lt(lowerRange, higherRange);
         require(TFHE.decrypt(isLower), "Invalid salary range");
         applicants[msg.sender] = Applicant(SalaryRange(lowerRange, higherRange));
-        
+
         emit ApplicantAdded(msg.sender);
     }
-    
+
     function isMatchingSalaryRange(uint256 jobId, address applicantAddress) public view returns (bool) {
         JobPost storage job = jobPosts[jobId];
         Applicant storage applicant = applicants[applicantAddress];
