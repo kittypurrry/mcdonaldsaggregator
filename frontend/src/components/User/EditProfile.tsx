@@ -145,7 +145,7 @@ const EditApplicant = () => {
   return (
     <div className="flex flex-col items-start gap-y-6">
       <div className="items-start flex flex-col gap-y-0.5">
-        <h2 className="font-bold text-2xl">Candiate Registration</h2>
+        <h2 className="font-bold text-2xl">Applicant Registration</h2>
         <p className="font-medium">Create your account to apply for jobs and get matched with employers.</p>
       </div>
 
@@ -172,28 +172,28 @@ const EditApplicant = () => {
               />
             </div>
             <div className="w-full flex flex-col gap-y-1 items-start flex-grow">
-              <label className="text-xs">Max.</label>
-              <div className="w-full relative flex flex-grow">
-                <input
-                  name="salaryMax"
-                  type="number"
-                  onInput={(e: any) => setSalaryRange({
-                    ...salaryRange,
-                    max: Number(e.target.value)
-                  })}
-                  min={0}
-                  max={10000000}
-                  placeholder="960000"
-                  aria-describedby="salaryMax"
-                  className={`px-2 bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 ${rangeError ? 'ring-red-400' : 'ring-gray-300'}`}
-                />
-
-                {rangeError &&
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <ExclamationCircleIcon aria-hidden="true" className="h-5 w-5 text-red-500" />
-                  </div>
-                }
-              </div>
+                <label className="text-xs">Max.</label>
+                <div className="w-full relative flex flex-grow">
+                    <input
+                        name="salaryMax"
+                        type="number"
+                        onInput={(e: any) => setSalaryRange({
+                          ...salaryRange,
+                          max: Number(e.target.value)
+                        })}
+                        min={0}
+                        max={10000000}
+                        placeholder="960000"
+                        aria-describedby="salaryMax"
+                        className={`px-2 bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 ${rangeError ? 'ring-red-400' : 'ring-gray-300'}`}
+                    />
+                
+                   { rangeError &&
+                    <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center pr-3">
+                      <ExclamationCircleIcon aria-hidden="true" className="h-5 w-5 text-red-500" />
+                    </div>
+                    }
+                </div>
             </div>
           </div>
           <p className="text-left mt-2 text-sm text-gray-500">

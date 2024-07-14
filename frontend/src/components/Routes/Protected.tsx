@@ -12,3 +12,15 @@ export const ProtectedRoute = ({ children }: { children: ReactNode | ReactElemen
   
   return children
 };
+
+export const CompanyProtectedRoute = ({ children }: { children: ReactNode | ReactElement }) => {
+
+  const {user} = useDynamicContext();
+
+  // @ts-ignore
+  if (!user || user?.metadata?.userType !== 'company') {
+    return <Navigate to={'/'} replace />;
+  }
+  
+  return children
+};
