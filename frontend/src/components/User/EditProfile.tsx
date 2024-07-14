@@ -1,5 +1,4 @@
 import { useDynamicContext, useUserUpdateRequest } from "@dynamic-labs/sdk-react-core"
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/database";
 import { useQuery } from "@tanstack/react-query";

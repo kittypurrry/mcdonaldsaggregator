@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getTimeDifference } from "../../lib/helper"
 import { Pin } from "../Icons/pin"
-import { BrowserProvider, AbiCoder } from 'ethers';
 import { useConfig } from 'wagmi'
 import { supabase } from "../../lib/database";
 import { readContract } from "wagmi/actions";
@@ -16,6 +15,7 @@ export const JobListing = () => {
   const { primaryWallet } = useDynamicContext()
   const config = useConfig();
   const isLoggedIn = useIsLoggedIn();
+  const [showDoesNotMatchModal, setShowDoesNotMatchModal] = 
 
  
   const { data:jobs } = useQuery({
@@ -75,6 +75,11 @@ export const JobListing = () => {
         functionName: 'isMatchingSalaryRange',
         args: [BigInt(jobId), primaryWallet?.address as `0x${string}`]
       })
+
+      // if does not match, show to user
+      if (!result) {
+        showDoesNotMatchModal()
+      }
 
       console.log(result)
     } catch( error: any) {
