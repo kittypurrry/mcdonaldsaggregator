@@ -1,4 +1,4 @@
-# Mcdonalds Aggregator
+# McDonalds Aggregator
 
 Welcome to McDonalds Aggregator 🍔
 Find your dream job in the world of fast food excellence!
