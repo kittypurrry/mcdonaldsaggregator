@@ -5,13 +5,19 @@ import { supabase } from "../../lib/database";
 import { useQuery } from "@tanstack/react-query";
 import { BrowserProvider, AbiCoder } from 'ethers';
 import { initFhevm, createInstance } from 'fhevmjs';
+import { useWriteContract } from 'wagmi'
 
 // Contract address of TFHE.sol.
 // From https://github.com/zama-ai/fhevmjs/blob/c4b8a80a8783ef965973283362221e365a193b76/bin/fhevm.js#L9
 const FHE_LIB_ADDRESS = "0x000000000000000000000000000000000000005d";
 
+// @ts-ignore
+export const toHexString = (bytes) =>
+  bytes.reduce((str: any, byte: any) => str + byte.toString(16).padStart(2, "0"), "");
+
 const createFhevmInstance = async () => {
   // Make sure your MetaMask is connected to Inco Gentry Testnet
+  // @ts-ignore
   const provider = new BrowserProvider(window.ethereum);
 
   const network = await provider.getNetwork();
@@ -36,9 +42,9 @@ export const EditProfile = () => {
     <div className="w-full lg:p-8 max-w-[60rem] mx-auto">
       <div className='border border-primaryRed rounded-lg px-4 py-6'>
         {/** @ts-ignore */}
-        { user?.metadata.userType == 'company' ?
+        {user?.metadata.userType == 'company' ?
           <EditCompany /> :
-          <EditApplicant /> 
+          <EditApplicant />
         }
       </div>
     </div>
@@ -51,10 +57,11 @@ const EditApplicant = () => {
   const [resume, setResume] = useState<File>()
   const [rangeError, setRangeError] = useState<boolean>(false)
   const { primaryWallet } = useDynamicContext();
+  const { data: hash, writeContractAsync } = useWriteContract();
 
   const { data: resumeUrl } = useQuery({
     queryKey: ['getUserResume', primaryWallet?.address],
-    queryFn: async() => {
+    queryFn: async () => {
       const { data } = await supabase.from('applicant_resumes').select().eq('wallet_address', primaryWallet?.address)
 
       return data?.[0].resume_url
@@ -75,48 +82,66 @@ const EditApplicant = () => {
 
     await initFhevm(); // Load TFHE
     const instance = await createFhevmInstance();
-    console.log(instance.encrypt64(10));
 
-    const transaction = {
-      account: primaryWallet?.address,
-      chain: 9090,
-      to: "0x3ae590eF3E999AbE7382997A0Eaa13BD8B27c2b7",
-      
-    };
+    const result = await writeContractAsync({
+      address: '0x3ae590eF3E999AbE7382997A0Eaa13BD8B27c2b7',
+      abi:
+        [
+          {
+            "inputs": [
+              {
+                "internalType": "bytes",
+                "name": "_lowerRange",
+                "type": "bytes"
+              },
+              {
+                "internalType": "bytes",
+                "name": "_higherRange",
+                "type": "bytes"
+              }
+            ],
+            "name": "addApplicant",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+        ]
+      ,
+      functionName: 'addApplicant',
+      args: [`0x${toHexString(instance.encrypt32(salaryRange.min))}`, `0x${toHexString(instance.encrypt32(salaryRange.max))}`]
+    })
 
-    const hash = await provider.sendTransaction(transaction);
+    console.log(result);
 
-    return;
-    
-    try { 
+    try {
       if (resume) {
-      const ext = resume.name.split('.')[1]
+        const ext = resume.name.split('.')[1]
 
-      // upload resume to supabase using primarywalletaddress.ext
-      const { data: uploadResume } = await supabase
-        .storage
-        .from('resume')
-        .upload(`${primaryWallet?.address}.${ext}`, resume, {
-          cacheControl: '3600',
-          upsert: true
-      })
+        // upload resume to supabase using primarywalletaddress.ext
+        const { data: uploadResume } = await supabase
+          .storage
+          .from('resume')
+          .upload(`${primaryWallet?.address}.${ext}`, resume, {
+            cacheControl: '3600',
+            upsert: true
+          })
 
-      // upload returned path to supabase 
-      if (uploadResume?.fullPath) {
-        const { status } = await supabase
-        .from('applicant_resumes')
-        .upsert({ wallet_address: primaryWallet?.address, resume_url: uploadResume.fullPath })
-        .select()
+        // upload returned path to supabase 
+        if (uploadResume?.fullPath) {
+          const { status } = await supabase
+            .from('applicant_resumes')
+            .upsert({ wallet_address: primaryWallet?.address, resume_url: uploadResume.fullPath })
+            .select()
 
-        if (status == 201) {
-          console.log("Resume uploaded successfully")
+          if (status == 201) {
+            console.log("Resume uploaded successfully")
+          }
         }
       }
-    }
     } catch (error) {
       console.log(error)
     }
-        
+
   }
 
   return (
@@ -126,27 +151,27 @@ const EditApplicant = () => {
         <p className="font-medium">Create your account to apply for jobs and get matched with employers.</p>
       </div>
 
-     
+
       <form className="w-full">
         <div className="mt-6 max-w-[60rem] w-full">
             <label className="font-bold text-left block text-md mb-2 font-medium leading-6 text-gray-900">
             Salary Range (USD)
-            </label>
-            <div className="mt-2 flex gap-x-4 w-full">
+          </label>
+          <div className="mt-2 flex gap-x-4 w-full">
             <div className="w-full flex flex-col gap-y-1 items-start flex-grow">
-                <label className="text-xs">Min.</label>
-                <input
-                    name="salaryMin"
-                    onInput={(e: any) => setSalaryRange({
-                        ...salaryRange,
-                        min: Number(e.target.value)
-                      })}
-                    type="number"
-                    min={0}
-                    placeholder="80000"
-                    aria-describedby="salaryMin"
-                    className="px-2 w-full bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
+              <label className="text-xs">Min.</label>
+              <input
+                name="salaryMin"
+                onInput={(e: any) => setSalaryRange({
+                  ...salaryRange,
+                  min: Number(e.target.value)
+                })}
+                type="number"
+                min={0}
+                placeholder="80000"
+                aria-describedby="salaryMin"
+                className="px-2 w-full bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
             </div>
             <div className="w-full flex flex-col gap-y-1 items-start flex-grow">
                 <label className="text-xs">Max.</label>
@@ -172,37 +197,37 @@ const EditApplicant = () => {
                     }
                 </div>
             </div>
-            </div>
-            <p className="text-left mt-2 text-sm text-gray-500">
+          </div>
+          <p className="text-left mt-2 text-sm text-gray-500">
             Your desired salary range will be secured and hidden from hiring managers with Fully Homomorphic Encryption (FHE).
-            </p>
+          </p>
         </div>
 
         <div className="mt-6 w-full max-w-[60rem]">
            <label className="font-bold text-left block text-md mb-2 font-medium leading-6 text-gray-900">
             Upload your resume
-           </label>
-           { !!resumeUrl && 
-           <p className="text-xs my-1 text-left">View curent resume <a href={`https://apqicdmwnqgdjirankkd.supabase.co/storage/v1/object/public/${resumeUrl}`} target="_blank" rel="noreferrer" className="font-medium cursor-pointer text-primaryRed hover:text-black underline">here</a></p>
-           }
-           <div className="mt-2 flex justify-center rounded-lg border border-dashed border-red/25 p-6">
+          </label>
+          {!!resumeUrl &&
+            <p className="text-xs my-1 text-left">View curent resume <a href={`https://apqicdmwnqgdjirankkd.supabase.co/storage/v1/object/public/${resumeUrl}`} target="_blank" rel="noreferrer" className="font-medium cursor-pointer text-primaryRed hover:text-black underline">here</a></p>
+          }
+          <div className="mt-2 flex justify-center rounded-lg border border-dashed border-red/25 p-6">
             <input
-                onChange={(e: React.FormEvent) => {
-                    const files = (e.target as HTMLInputElement).files
-                    if (files && files.length > 0) {
-                      setResume(files[0])
-                    }
-                }}
-                name="file-upload" type="file"
-                accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf"
-                className="bg-transparent relative cursor-pointer rounded-md text-black font-semibold border-0 outline-0 ring-0 hover:text-red-500"
+              onChange={(e: React.FormEvent) => {
+                const files = (e.target as HTMLInputElement).files
+                if (files && files.length > 0) {
+                  setResume(files[0])
+                }
+              }}
+              name="file-upload" type="file"
+              accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf"
+              className="bg-transparent relative cursor-pointer rounded-md text-black font-semibold border-0 outline-0 ring-0 hover:text-red-500"
             >
             </input>
-            </div>
+          </div>
 
-            <p className="text-left mt-2 text-sm text-gray-500">
-             We will only share your resume to companies you have applied for.
-            </p>
+          <p className="text-left mt-2 text-sm text-gray-500">
+            We will only share your resume to companies you have applied for.
+          </p>
         </div>
 
         <button onClick={(e) => handleUpdateApplicantInfo(e)} className="mt-16 border-0 ring-0 outline-0 transition-all w-full bg-primaryRed px-4 rounded-md py-2 text-sm text-white hover:bg-accentYellow hover:text-black cursor-pointer">Submit</button>
@@ -214,13 +239,13 @@ const EditApplicant = () => {
 
 const EditCompany = () => {
 
-  const [companyInfo, setCompanyInfo] = useState<Company>({ name: ''})
+  const [companyInfo, setCompanyInfo] = useState<Company>({ name: '' })
   const [logo, setLogo] = useState<File>()
   const { primaryWallet } = useDynamicContext();
 
   useQuery({
     queryKey: ['getCompanyInfo', primaryWallet?.address],
-    queryFn: async() => {
+    queryFn: async () => {
       const { data } = await supabase.from('companies').select().eq('wallet_address', primaryWallet?.address)
 
       if (!!data?.[0]) {
@@ -238,11 +263,11 @@ const EditCompany = () => {
 
 
 
-  const handleUpdateCompanyInfo = async(e: any) => {
+  const handleUpdateCompanyInfo = async (e: any) => {
     e.preventDefault();
     let logoUrl = companyInfo.logo
-    
-    try { 
+
+    try {
       if (!!logo) {
         const ext = logo.name.split('.')[1]
 
@@ -253,12 +278,12 @@ const EditCompany = () => {
           .upload(`${primaryWallet?.address}.${ext}`, logo, {
             cacheControl: '3600',
             upsert: true
-        })
-        
+          })
+
         if (uploadedLogo?.fullPath) {
           logoUrl = uploadedLogo.fullPath
         }
-     }
+      }
 
       const { status } = await supabase
         .from('companies')
@@ -284,7 +309,7 @@ const EditCompany = () => {
     <form className="w-full">
       <div className="mt-6 max-w-[60rem] w-full">
           <label className="font-bold text-left block text-lg mb-2 font-medium leading-6 text-gray-900">
-          Company Details
+            Company Details
           </label>
           <p className="text-sm text-left mb-4">Provide details about your company</p>
           <div className="flex flex-col gap-y-6">
@@ -292,55 +317,55 @@ const EditCompany = () => {
               <div className="w-full flex flex-col gap-y-1 items-start flex-grow">
                 <label className="text-xs">Company Name</label>
                 <input
-                    name="companyName"
-                    onInput={(e: any) => setCompanyInfo({
-                        ...companyInfo,
-                        name: e.target.value
-                      })}
-                    value={companyInfo.name}
-                    type="text"
-                    maxLength={150}
-                    className="px-2 w-full bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  name="companyName"
+                  onInput={(e: any) => setCompanyInfo({
+                    ...companyInfo,
+                    name: e.target.value
+                  })}
+                  value={companyInfo.name}
+                  type="text"
+                  maxLength={150}
+                  className="px-2 w-full bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
               <div className="w-full flex flex-col gap-y-1 items-start flex-grow">
                 <label className="text-xs">Company Website</label>
                 <input
-                    name="companyWebsite"
-                    onInput={(e: any) => setCompanyInfo({
-                        ...companyInfo,
-                        website: e.target.value
-                      })}
-                    value={companyInfo.website}
-                    type="text"
-                    maxLength={100}
-                    className="px-2 w-full bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  name="companyWebsite"
+                  onInput={(e: any) => setCompanyInfo({
+                    ...companyInfo,
+                    website: e.target.value
+                  })}
+                  value={companyInfo.website}
+                  type="text"
+                  maxLength={100}
+                  className="px-2 w-full bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
 
             <div className="w-full flex flex-col gap-y-1 items-start flex-grow">
               <label className="text-xs">Company Logo</label>
-              
+
               <div className="flex gap-x-4 items-center mt-2">
-                { !!companyInfo.logo &&
-                 <div className="flex flex-col items-center gap-y-2">
-                  <img src={`https://apqicdmwnqgdjirankkd.supabase.co/storage/v1/object/public/${companyInfo.logo}`} className="bg-gray-400 rounded-full w-16 h-16" />
-                 </div>
+                {!!companyInfo.logo &&
+                  <div className="flex flex-col items-center gap-y-2">
+                    <img src={`https://apqicdmwnqgdjirankkd.supabase.co/storage/v1/object/public/${companyInfo.logo}`} className="bg-gray-400 rounded-full w-16 h-16" />
+                  </div>
                 }
                 <div className="flex justify-center rounded-lg border border-dashed border-red/25 p-6">
-                <input
+                  <input
                     onChange={(e: React.FormEvent) => {
-                        const files = (e.target as HTMLInputElement).files
-                        if (files && files.length > 0) {
-                          setLogo(files[0])
-                        }
+                      const files = (e.target as HTMLInputElement).files
+                      if (files && files.length > 0) {
+                        setLogo(files[0])
+                      }
                     }}
                     name="file-upload" type="file"
                     accept="images/*"
                     className="bg-transparent relative cursor-pointer rounded-md text-black font-semibold border-0 outline-0 ring-0 hover:text-red-500"
-                >
-                </input>
+                  >
+                  </input>
                 </div>
               </div>
             </div>
@@ -348,22 +373,22 @@ const EditCompany = () => {
             <div className="w-full flex flex-col gap-y-1 items-start flex-grow">
               <label className="text-xs">Company Description</label>
               <textarea
-                  name="companyDescription"
-                  onInput={(e: any) => setCompanyInfo({
-                      ...companyInfo,
-                      description: e.target.value
-                    })}
-                  value={companyInfo.description}
-                  maxLength={400}
-                  className="h-[10rem] px-2 w-full bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                name="companyDescription"
+                onInput={(e: any) => setCompanyInfo({
+                  ...companyInfo,
+                  description: e.target.value
+                })}
+                value={companyInfo.description}
+                maxLength={400}
+                className="h-[10rem] px-2 w-full bg-transparent block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
-            </div>  
+            </div>
+          </div>
         </div>
-      </div>
 
-      <button onClick={(e) => handleUpdateCompanyInfo(e)} className="mt-16 border-0 ring-0 outline-0 transition-all w-full bg-primaryRed px-4 rounded-md py-2 text-sm text-white hover:bg-accentYellow hover:text-black cursor-pointer">Complete Registration</button>
+        <button onClick={(e) => handleUpdateCompanyInfo(e)} className="mt-16 border-0 ring-0 outline-0 transition-all w-full bg-primaryRed px-4 rounded-md py-2 text-sm text-white hover:bg-accentYellow hover:text-black cursor-pointer">Complete Registration</button>
 
-    </form>
-  </div>
+      </form>
+    </div>
   )
 }
