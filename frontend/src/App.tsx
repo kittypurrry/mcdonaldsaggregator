@@ -14,6 +14,7 @@ import {
 } from 'wagmi';
 import { DynamicWagmiConnector } from '@dynamic-labs/wagmi-connector';
 import { http, type Chain } from 'viem'
+import { CreateJob } from './components/Job/Create'
 
 export const inco = {
   id: 9090,
@@ -81,6 +82,12 @@ function App() {
                       <ProtectedRoute>
                         <EditProfile />
                       </ProtectedRoute>
+                    } />
+                  <Route path="/job/create"
+                    element={
+                      <CompanyProtectedRoute>
+                        <CreateJob />
+                      </CompanyProtectedRoute>
                     } />
                 </Route>
               </Routes>

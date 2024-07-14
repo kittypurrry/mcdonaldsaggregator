@@ -30,8 +30,10 @@ export const CreateJob = () => {
           .select()
   
         if (status == 201) {
-          console.log(data?.[0])
           console.log("Job posted successfully.")
+
+          // job id created ---> data?.[0]
+          const jobId = data?.[0].id
         }
       } catch (error) {
         console.log(error)
