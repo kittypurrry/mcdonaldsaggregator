@@ -2,7 +2,24 @@ import { getTimeDifference } from "../../lib/helper"
 import { Pin } from "../Icons/pin"
 import { BrowserProvider, AbiCoder } from 'ethers';
 import { initFhevm, createInstance } from 'fhevmjs';
-import { useReadContract } from 'wagmi'
+import { http, createConfig, readContract } from '@wagmi/core'
+import { Chain } from '@wagmi/core/chains'
+
+export const inco = {
+  id: 9090,
+  name: 'Inco',
+  nativeCurrency: { name: 'INCO', symbol: 'INCO', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['https://testnet.inco.org'] },
+  },
+} as const satisfies Chain
+
+export const config = createConfig({
+  chains: [inco],
+  transports: {
+    [inco.id]: http(),
+  },
+})
 
 // Contract address of TFHE.sol.
 // From https://github.com/zama-ai/fhevmjs/blob/c4b8a80a8783ef965973283362221e365a193b76/bin/fhevm.js#L9
@@ -32,47 +49,13 @@ const createFhevmInstance = async () => {
 };
 
 export const JobListing = ({ jobs }: { jobs: Job[] }) => {
-  const result = useReadContract({
-    abi: [
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "jobId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "applicantAddress",
-            "type": "address"
-          }
-        ],
-        "name": "isMatchingSalaryRange",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-    ],
-    address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-    functionName: 'isMatchingSalaryRange',
-    args: [1n, "0x46EA78EFC79aed85B0DE4d4dcecB53633d5E3445"]
-  })
-
-  console.log("result: ", result);
-
   const handleApplyJob = async (e: any) => {
     e.preventDefault();
 
     await initFhevm(); // Load TFHE
     const instance = await createFhevmInstance();
 
-    const result = await writeContractAsync({
+    const result = await readContract(config, {
       address: '0xEC3676fd25A7d5D0B885C8c0f3083B15aaC597DA',
       abi:
         [
@@ -103,7 +86,7 @@ export const JobListing = ({ jobs }: { jobs: Job[] }) => {
         ]
       ,
       functionName: 'isMatchingSalaryRange',
-      args: [1, "0x46EA78EFC79aed85B0DE4d4dcecB53633d5E3445"]
+      args: [1n, "0x46EA78EFC79aed85B0DE4d4dcecB53633d5E3445"]
     })
     console.log(result);
   }
