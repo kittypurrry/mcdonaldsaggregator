@@ -117,7 +117,23 @@ const config: HardhatUserConfig = {
   crossdeploy: {
     contracts:  ["HiddenSalary", "JobListings"],
     signer: process.env.PRIVATE_KEY || "",
-  }
+  },
+  etherscan: {
+    apiKey: {
+      // Is not required by blockscout. Can be any non-empty string
+      inco: "abc"
+    },
+    customChains: [
+      {
+        network: "inco",
+        chainId: 9090,
+        urls: {
+          apiURL: "https://explorer.testnet.inco.org/api",
+          browserURL: "https://explorer.testnet.inco.org/",
+        }
+      }
+    ]
+  },
 };
 
 export default config;
