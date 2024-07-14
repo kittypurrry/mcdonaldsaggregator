@@ -136,8 +136,6 @@ export const JobListing = () => {
       console.log(error.message)
       return error
     }
-
-    console.log(result)
   }
 
 
