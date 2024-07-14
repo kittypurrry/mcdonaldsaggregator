@@ -31,12 +31,12 @@ export const SuccessModal = ({ setShowModal }: { setShowModal: Function }) => {
                 </div>
               </div>
             </div>
-            <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+            <div className="mt-5 w-full">
               <button
                 type="button"
                 data-autofocus
                 onClick={() => setShowModal(false)}
-                className="w-full mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                className="w-full mt-3 inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
               >
                 Close
               </button>
