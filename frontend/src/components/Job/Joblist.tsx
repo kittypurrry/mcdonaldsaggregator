@@ -7,7 +7,7 @@ import { useConfig, useReadContract } from 'wagmi'
 import { supabase } from "../../lib/database";
 import { useEffect, useState } from "react";
 import { readContract } from "wagmi/actions";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 
 // Contract address of TFHE.sol.
 // From https://github.com/zama-ai/fhevmjs/blob/c4b8a80a8783ef965973283362221e365a193b76/bin/fhevm.js#L9
@@ -40,6 +40,8 @@ export const JobListing = () => {
 
   const { user, primaryWallet } = useDynamicContext()
   const config = useConfig();
+  const isLoggedIn = useIsLoggedIn();
+
  
   const { data:jobs } = useQuery({
     queryKey: ['getAllJobs'],
@@ -135,8 +137,8 @@ export const JobListing = () => {
           </div>
 
           {/** Apply button */}
-          <button onClick={(e) => handleApplyJob(e, job.id)} className="h-fit transition-all bg-primaryRed px-4 py-1.5 text-sm text-[#FFF] outline-0 border-0 ring-0 hover:text-[#000] hover:ring-0 hover:outline-0 hover:bg-accentYellow">
-            Apply
+          <button onClick={(e) => handleApplyJob(e, job.id)} className={`h-fit transition-all px-4 py-1.5 text-sm text-[#FFF] outline-0 border-0 ring-0 hover:text-[#000] hover:ring-0 hover:outline-0 hover:bg-accentYellow ${ !isLoggedIn ? 'pointer-events-none bg-gray-400' : 'bg-primaryRed'}`}>
+            { isLoggedIn ? 'Apply' : 'Log in to Apply' } 
           </button>
         </li>
       ))}
