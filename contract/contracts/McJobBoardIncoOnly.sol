@@ -53,11 +53,6 @@ contract JobListings {
     }
     
     function isMatchingSalaryRange(uint256 jobId, address applicantAddress) public view returns (bool) {
-        require(jobId > 0 && jobId <= jobPostCount, "Invalid job ID");
-
-        ebool applicantFound = TFHE.gt(applicants[applicantAddress].salaryExpectation.lowerRange, TFHE.asEuint32(0));
-        require(TFHE.decrypt(applicantFound), "Applicant not found");
-
         JobPost storage job = jobPosts[jobId];
         Applicant storage applicant = applicants[applicantAddress];
 
