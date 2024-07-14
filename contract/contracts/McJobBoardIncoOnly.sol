@@ -2,10 +2,10 @@
 
 pragma solidity >=0.8.9 <0.9.0;
 
-import "fhevm@v0.3.0/lib/TFHE.sol";
-import "fhevm@v0.3.0/abstracts/EIP712WithModifier.sol";
+import "fhevm/lib/TFHE.sol";
+import "fhevm/abstracts/EIP712WithModifier.sol";
 
-contract JobListings {
+contract JobListingsInco {
     struct SalaryRange {
         euint32 lowerRange;
         euint32 higherRange;
