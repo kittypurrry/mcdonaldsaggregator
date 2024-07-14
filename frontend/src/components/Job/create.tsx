@@ -37,7 +37,7 @@ const createFhevmInstance = async () => {
 export const CreateJob = () => {
 
   const [salaryRange, setSalaryRange] = useState<{ min: number, max: number }>({ min: 0, max: 0 })
-  const { data: hash, writeContractAsync } = useWriteContract();
+  const { writeContractAsync } = useWriteContract();
   const [processing, setProcessing] = useState<boolean>(false)
 
   const [jobInfo, setJobInfo] = useState<Job>({
