@@ -133,10 +133,6 @@ const EditApplicant = () => {
         functionName: 'addApplicant',
         args: [`0x${toHexString(instance.encrypt32(salaryRange.min))}`, `0x${toHexString(instance.encrypt32(salaryRange.max))}`]
       })
-
-      if (result) {
-        
-      }
     }
 
 
