@@ -37,7 +37,7 @@ const createFhevmInstance = async () => {
 export const CreateJob = () => {
 
   const [salaryRange, setSalaryRange] = useState<{ min: number, max: number }>({ min: 0, max: 0 })
-  const { data: hash, writeContractAsync } = useWriteContract();
+  const { writeContractAsync } = useWriteContract();
   const [processing, setProcessing] = useState<boolean>(false)
 
   const [jobInfo, setJobInfo] = useState<Job>({
@@ -69,11 +69,11 @@ export const CreateJob = () => {
         // job id created ---> data?.[0]
         const jobId = data?.[0].id
 
-        await initFhevm(); // Load TFHE
+        await initFhevm(); 
       const instance = await createFhevmInstance();
 
       await writeContractAsync({
-        address: '0xEC3676fd25A7d5D0B885C8c0f3083B15aaC597DA',
+        address: '0x05D39616DEFD9f2dcC0f0E2f012a9Bc1F4CFAf93',
         abi:
           [{
             "inputs": [

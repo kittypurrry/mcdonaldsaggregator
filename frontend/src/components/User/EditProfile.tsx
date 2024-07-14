@@ -1,5 +1,4 @@
 import { useDynamicContext, useUserUpdateRequest } from "@dynamic-labs/sdk-react-core"
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/database";
 import { useQuery } from "@tanstack/react-query";
@@ -106,7 +105,7 @@ const EditApplicant = () => {
       const instance = await createFhevmInstance();
       
       await writeContractAsync({
-        address: '0x3ae590eF3E999AbE7382997A0Eaa13BD8B27c2b7',
+        address: '0x05D39616DEFD9f2dcC0f0E2f012a9Bc1F4CFAf93',
         abi:
           [
             {

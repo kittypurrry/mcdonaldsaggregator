@@ -6,15 +6,14 @@ import { Layout } from './lib/components/Layout'
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import { EditProfile } from './components/User/EditProfile'
 import { CompanyProtectedRoute, ProtectedRoute } from './components/Routes/Protected'
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   createConfig,
   WagmiProvider,
 } from 'wagmi';
 import { DynamicWagmiConnector } from '@dynamic-labs/wagmi-connector';
 import { http, type Chain } from 'viem'
-import { CreateJob } from './components/Job/Create'
-import { supabase } from './lib/database'
+import { CreateJob } from './components/Job/Add'
 
 export const inco = {
   id: 9090,

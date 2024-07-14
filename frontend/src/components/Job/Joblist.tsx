@@ -1,45 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 import { getTimeDifference } from "../../lib/helper"
 import { Pin } from "../Icons/pin"
-import { BrowserProvider, AbiCoder } from 'ethers';
-import { initFhevm, createInstance } from 'fhevmjs';
-import { useConfig, useReadContract } from 'wagmi'
+import { useConfig } from 'wagmi'
 import { supabase } from "../../lib/database";
-import { useEffect, useState } from "react";
 import { readContract } from "wagmi/actions";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-
-// Contract address of TFHE.sol.
-// From https://github.com/zama-ai/fhevmjs/blob/c4b8a80a8783ef965973283362221e365a193b76/bin/fhevm.js#L9
-const FHE_LIB_ADDRESS = "0x000000000000000000000000000000000000005d";
-
+import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
+import { useState } from "react";
+import { RejectionModal } from "./RejectionModal";
+import { SuccessModal } from "./SuccessModal";
 // @ts-ignore
 export const toHexString = (bytes) =>
   bytes.reduce((str: any, byte: any) => str + byte.toString(16).padStart(2, "0"), "");
 
-const createFhevmInstance = async () => {
-  // Make sure your MetaMask is connected to Inco Gentry Testnet
-  // @ts-ignore
-  const provider = new BrowserProvider(window.ethereum);
-
-  const network = await provider.getNetwork();
-  const chainId = +network.chainId.toString(); // 9090
-
-  const ret = await provider.call({
-    to: FHE_LIB_ADDRESS,
-    // first four bytes of keccak256('fhePubKey(bytes1)') + 1 byte for library
-    data: "0xd9d47bb001",
-  });
-  const decoded = AbiCoder.defaultAbiCoder().decode(["bytes"], ret);
-  const publicKey = decoded[0];
-
-  return createInstance({ chainId, publicKey });
-};
 
 export const JobListing = () => {  
 
-  const { user, primaryWallet } = useDynamicContext()
+  const { primaryWallet } = useDynamicContext()
   const config = useConfig();
+  const isLoggedIn = useIsLoggedIn();
+  const [showRejectionModal, setShowRejectionModal] = useState<boolean>(false)
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
+
  
   const { data:jobs } = useQuery({
     queryKey: ['getAllJobs'],
@@ -60,46 +41,13 @@ export const JobListing = () => {
     }
   })
 
-  /** 
-  const result = useReadContract({
-    abi: [
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "jobId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "applicantAddress",
-            "type": "address"
-          }
-        ],
-        "name": "isMatchingSalaryRange",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-    ],
-    address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-    functionName: 'isMatchingSalaryRange',
-    args: [1n, "0x46EA78EFC79aed85B0DE4d4dcecB53633d5E3445"]
-  })**/
-
 
   const handleApplyJob = async (e: any, jobId: number) => {
     e.preventDefault();
 
     try {
       const result = await readContract(config, {
-        address: '0xEC3676fd25A7d5D0B885C8c0f3083B15aaC597DA',
+        address: '0x05D39616DEFD9f2dcC0f0E2f012a9Bc1F4CFAf93',
         abi:
           [
             {
@@ -131,6 +79,17 @@ export const JobListing = () => {
         functionName: 'isMatchingSalaryRange',
         args: [BigInt(jobId), primaryWallet?.address as `0x${string}`]
       })
+
+      // if does not match, show to user
+      if (!result) {
+        setShowSuccessModal(false)
+        setShowRejectionModal(true)
+      } else {
+        setShowSuccessModal(true)
+        setShowRejectionModal(false)
+      }
+
+      console.log(result)
     } catch( error: any) {
       console.log(error)
       console.log(error.message)
@@ -167,11 +126,19 @@ export const JobListing = () => {
           </div>
 
           {/** Apply button */}
-          <button onClick={(e) => handleApplyJob(e, job.id)} className="h-fit transition-all bg-primaryRed px-4 py-1.5 text-sm text-[#FFF] outline-0 border-0 ring-0 hover:text-[#000] hover:ring-0 hover:outline-0 hover:bg-accentYellow">
-            Apply
+          <button onClick={(e) => handleApplyJob(e, job.id)} className={`h-fit transition-all px-4 py-1.5 text-sm text-[#FFF] outline-0 border-0 ring-0 hover:text-[#000] hover:ring-0 hover:outline-0 hover:bg-accentYellow ${ !isLoggedIn ? 'pointer-events-none bg-gray-400' : 'bg-primaryRed'}`}>
+            { isLoggedIn ? 'Apply' : 'Log in to Apply' } 
           </button>
         </li>
       ))}
+
+      { showRejectionModal &&
+        <RejectionModal setShowModal={setShowRejectionModal} />
+      }
+
+      { showSuccessModal && 
+        <SuccessModal setShowModal={setShowSuccessModal} />
+      }
     </ul>
   )
 }
