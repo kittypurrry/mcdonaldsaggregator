@@ -73,7 +73,7 @@ export const CreateJob = () => {
       const instance = await createFhevmInstance();
 
       await writeContractAsync({
-        address: '0xEC3676fd25A7d5D0B885C8c0f3083B15aaC597DA',
+        address: '0x05D39616DEFD9f2dcC0f0E2f012a9Bc1F4CFAf93',
         abi:
           [{
             "inputs": [

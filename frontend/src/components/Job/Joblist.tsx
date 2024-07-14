@@ -60,46 +60,13 @@ export const JobListing = () => {
     }
   })
 
-  /** 
-  const result = useReadContract({
-    abi: [
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "jobId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "applicantAddress",
-            "type": "address"
-          }
-        ],
-        "name": "isMatchingSalaryRange",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-    ],
-    address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-    functionName: 'isMatchingSalaryRange',
-    args: [1n, "0x46EA78EFC79aed85B0DE4d4dcecB53633d5E3445"]
-  })**/
-
 
   const handleApplyJob = async (e: any, jobId: number) => {
     e.preventDefault();
 
     try {
       const result = await readContract(config, {
-        address: '0xEC3676fd25A7d5D0B885C8c0f3083B15aaC597DA',
+        address: '0x05D39616DEFD9f2dcC0f0E2f012a9Bc1F4CFAf93',
         abi:
           [
             {
@@ -131,6 +98,7 @@ export const JobListing = () => {
         functionName: 'isMatchingSalaryRange',
         args: [BigInt(jobId), primaryWallet?.address as `0x${string}`]
       })
+
     } catch( error: any) {
       console.log(error)
       console.log(error.message)
