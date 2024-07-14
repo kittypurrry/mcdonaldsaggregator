@@ -69,7 +69,7 @@ export const CreateJob = () => {
         // job id created ---> data?.[0]
         const jobId = data?.[0].id
 
-        await initFhevm(); // Load TFHE
+        await initFhevm(); 
       const instance = await createFhevmInstance();
 
       await writeContractAsync({
